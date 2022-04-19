@@ -1,23 +1,13 @@
 version: "3.9"
 services:
-  db:
-    image: postgres
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
   web:
-    build: ./django_app
-    command: python manage.py runserver 0.0.0.0:8000
+    build: ./blog
+    command: gunicorn blog.wsgi:application --bind 0.0.0.0:8000
+    expose:
+      - 8000
+  nginx:
+    image: nginx:latest
     volumes:
-      - .:/code
-    ports:
-      - "8000:8000"
-    environment:
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    depends_on:
-      - db
+      - /var/:/usr/share/nginx/html:ro
+    expose:
+      - 8000:80
